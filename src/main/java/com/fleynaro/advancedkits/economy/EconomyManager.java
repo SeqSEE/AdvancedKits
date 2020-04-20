@@ -1,20 +1,23 @@
 package com.fleynaro.advancedkits.economy;
 
 import cn.nukkit.Player;
+
+import java.math.BigDecimal;
+
 import com.fleynaro.advancedkits.Main;
-import me.onebone.economyapi.EconomyAPI;
+import xyz.cryptechcraft.cryptoconomyapi.CryptoconomyAPI;
 
 public class EconomyManager {
 
-    private EconomyAPI api;
+	private CryptoconomyAPI api;
 
     public EconomyManager(Main plugin) {
-        if (plugin.getServer().getPluginManager().getPlugin("EconomyAPI") != null) {
-            api = EconomyAPI.getInstance();
+        if (plugin.getServer().getPluginManager().getPlugin("CryptoconomyAPI") != null) {
+            api = CryptoconomyAPI.getInstance();
         }
     }
 
-    public boolean grantKit(Player player, int money) {
-        return this.api != null && this.api.reduceMoney(player, money) == 1;
+    public boolean grantKit(Player player, BigDecimal money) {
+        return this.api != null && this.api.reduceMoney(player, money.toPlainString()) == CryptoconomyAPI.RET_SUCCESS;
     }
 }

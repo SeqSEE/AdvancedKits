@@ -8,6 +8,8 @@ import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.ConfigSection;
+
+import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 
 public class Kit {
@@ -15,18 +17,19 @@ public class Kit {
     private Main ak;
     private ConfigSection data;
     private String name;
-    private int cost = 0;
+    private BigDecimal cost = new BigDecimal(0).setScale(8, BigDecimal.ROUND_HALF_DOWN);
     private int coolDown;
     private Config coolDowns;
     private final ConfigSection coolDownsPlayer;
 
-    public Kit(Main ak, ConfigSection data, String name) {
+    @SuppressWarnings("serial")
+	public Kit(Main ak, ConfigSection data, String name) {
         this.ak = ak;
         this.data = data;
         this.name = name;
         this.coolDown = this.getCoolDownMinutes();
-        if (this.data.containsKey("money") && this.data.getInt("money") != 0) {
-            this.cost = this.data.getInt("money");
+        if (this.data.containsKey("money") && new BigDecimal(this.data.getString("money")).setScale(8, BigDecimal.ROUND_HALF_DOWN).compareTo(new BigDecimal(0).setScale(8, BigDecimal.ROUND_HALF_DOWN)) > 0) {
+            this.cost = new BigDecimal(this.data.getString("money")).setScale(8, BigDecimal.ROUND_HALF_DOWN);
         }
 
         coolDowns = new Config(this.ak.getDataFolder() + "/cooldowns/" + this.name.toLowerCase() + ".yml", Config.YAML,
@@ -41,7 +44,7 @@ public class Kit {
     public boolean handleRequest(Player player) {
         if (this.testPermission(player)) {
             if (!this.coolDownsPlayer.exists(player.getName().toLowerCase())) {
-                if (this.cost > 0) {
+                if (this.cost.compareTo(new BigDecimal(0).setScale(8, BigDecimal.ROUND_HALF_DOWN)) > 0) {
                     if (this.ak.economy.grantKit(player, this.cost)) {
                         this.addTo(player);
                         player.sendMessage(this.ak.langManager.getTranslation("sel-kit", new String[] { this.name }));
